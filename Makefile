@@ -8,7 +8,8 @@
 
 DOS1770=dos1770
 DOS8271=dos8271
-LIST=../list
+LISTPATH=list
+LIST="../$(LISTPATH)"
 ROM=rom
 SRCPATH=../src
 DISKPATH=disks
@@ -43,6 +44,7 @@ inteldos:
 init:
 	mkdir -p $(ROM)
 	mkdir -p $(DISKPATH)
+	mkdir -p $(LISTPATH)
 	
 disks: init roms wddos inteldos
 	sh build-disk.sh $(DOS1770) $(DISKPATH)
