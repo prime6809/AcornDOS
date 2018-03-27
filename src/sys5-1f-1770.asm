@@ -510,7 +510,7 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 ; Check end of command
 ;--------------------------------------------
 
-.LF17E
+.GET_CHK_FNAME
 		JSR 	CHECK_FNPARAM           
 	
 ;============================================
@@ -605,7 +605,7 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 ; *INFO <file> - display file information
 ; =======================================
 .infocom
-		JSR 	LF17E					; Check filename in cat 
+		JSR 	GET_CHK_FNAME			; Check filename in cat 
 		JSR 	print_info				; Print filenaam, start,link,lengte,sector
 		JMP 	set_qual_to_use         ; Set qual back if changed by USE
  
@@ -955,7 +955,7 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 ; *DELETE <file>
 ; ==============
 .deletecom
-		JSR 	LF17E                   ; Filename in cat
+		JSR 	GET_CHK_FNAME           ; Filename in cat
 		sty     FILENAMEPTR             ; Save pointer to name
 .LF468
 		jsr     print_info_ifmon        ; Print info
@@ -1061,7 +1061,7 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 		
         ldy     FILENAMEPTR             ; recover filename ptr
         jsr     print_info_ifmon        ; Print file info (if MON).
-.LF4EC
+.ROM_READ_SECTORS
 		lda		#WCMD_READ_SEC			; Flag reading
 
 ; Code between LF4F1 - F50D shared by LODVEC and SAVVEC	
@@ -1258,7 +1258,7 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 ; ==============
 .unlockcom
 		php                             ; Save flags
-		JSR 	LF17E					; Check filename in cat 
+		JSR 	GET_CHK_FNAME			; Check filename in cat 
         lda     USEQUAL                 ; Get qualifier 
         rol     A                       ; Shift top bit to carry
         plp                             ; restore flags (lock falg in carry)
@@ -1345,7 +1345,7 @@ skipto $f62c
 		EQUS 	"Syntax?"
 		BRK
 		
-.LF641
+.DISK_FULL
 		JSR 	INLINE_PRINT           	; Disk full
 		EQUS 	"Full"
 		BRK
@@ -1403,7 +1403,7 @@ skipto $f62c
         ldy     WKBASE + $0105          ; 
         BEQ 	LF6E2           		; Disk empty?
 		CPY 	#&F8            		; Disk full?  
-		BCS 	LF641         
+		BCS 	DISK_FULL         
 		
 		JSR 	LF37E           		; Calculate ??
 		JMP 	LF6B8           		
@@ -1418,7 +1418,7 @@ skipto $f62c
 
 .LF6BD
 		BCS 	LF6CA           
-.LF6BF		
+.NO_ROOM		
 		JSR 	INLINE_PRINT          
 		EQUS 	"No room"
 		BRK
@@ -1468,7 +1468,7 @@ skipto $f62c
         
 .LF710
 		JSR 	LF67D           
-.LF713
+.ROM_WRITE_SECTORS
         LDA		#WCMD_WRITE_SEC			; Flag we are writing
 		jmp     common_rw               ; Go do it
 
@@ -2384,7 +2384,7 @@ endif
 		STA &E6             ; FBC0 85 E6     .f  
 		LDA WKBASE + &021D,Y         ; FBC2 B9 1D 22  9." 
 		STA &E5             ; FBC5 85 E5     .e  
-		JSR LF713           ; FBC7 20 13 F7   .w 
+		JSR ROM_WRITE_SECTORS           ; FBC7 20 13 F7   .w 
 
 		LDY &C2             ; FBCA A4 C2     $B  
 		LDA #&BF            ; FBCC A9 BF     )?  
@@ -2392,7 +2392,7 @@ endif
 		BCC LFBD9           ; FBD1 90 06     ..  
 .LFBD3
 		JSR LFADC           ; FBD3 20 DC FA   \z 
-		JSR LF4EC           ; FBD6 20 EC F4   lt 
+		JSR ROM_READ_SECTORS           ; FBD6 20 EC F4   lt 
 .LFBD9
 		LDY &C2             ; FBDC A4 C2     $B  
 .LFBDE

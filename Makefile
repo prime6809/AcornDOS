@@ -55,4 +55,4 @@ clean:
 	cd $(DOS1770) && make clean
 	cd $(DOS8271) && make clean
 	rm -f list/*.txt
-	rm -f $(DISKPATH)/*.ssd DISKPATH)/*.hfe
+	rm -f $(DISKPATH)/*.ssd $(DISKPATH)/*.hfe

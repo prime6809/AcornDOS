@@ -6,7 +6,6 @@
     include "..\src\sysdefs.asm"
     include "..\src\wdfdc.asm"
     include "..\src\intelfdc.asm"
-	
 L214F   = $214F
 
 BufBASE		= $2C00				; buffer used for copying sectors
@@ -203,7 +202,7 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         STA     LOADADDR+1
         JSR     START_MOTOR_SELECT          ; start drive motor
 
-        JSR     LF4EC                       ; Read sectors
+        JSR     ROM_READ_SECTORS            ; Read sectors
 
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
@@ -212,15 +211,10 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         
         LDA     ToDrive                     ; get destination drive
         STA     DRIVENO
-
-if (WD1770)        
-;        LDA     DestTrack                   ; restore destination track
-;        STA     WTRACK
-endif
         
         JSR     START_MOTOR_SELECT          ; start drive motor
 
-        JSR     LF713                       ; write sectors
+        JSR     ROM_WRITE_SECTORS           ; write sectors
 
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
@@ -296,9 +290,4 @@ SAVE "BACKUP.DFS",BeebDisStartAddr,BeebDisEndAddr
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        SYS40   = 1
-if (WD1770)		
-        include "..\src\sys5-1f-1770.asm"
-else
-        include "..\src\sys5-1f.asm"
-endif
+        include "..\src\rominclude.asm"

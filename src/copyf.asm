@@ -84,7 +84,7 @@ BufLSB		= <BufBASE			; Low byte offset
 
 .L2883
         NOP
-        JSR     LF02D						; read filename to $100-$140
+        JSR     READ_LINE					; read filename to $100-$140
 
         LDA     STACKPAGE					; point at beginning of name
         CMP     #$0D						; just enter : null filename
@@ -93,7 +93,7 @@ BufLSB		= <BufBASE			; Low byte offset
         LDA     FromDrive					; set from drive as current
         STA     DRIVENO	
         LDY     #$00
-        JSR     LF17E						; Check to see if filename is in catalog
+        JSR     GET_CHK_FNAME  				; Check to see if filename is in catalog
 
         JSR     set_qual_to_use				; Make USE qualifier equal to SET qualifier						
 
@@ -143,7 +143,7 @@ BufLSB		= <BufBASE			; Low byte offset
         CPY     #$F8						; Max number of files?
         BCC     L28E6						; no skip					
 
-        JMP     LF641						; Yep: print message and quit
+        JMP     DISK_FULL					; Yep: print message and quit
 
 .L28E6
         JSR     L2A00
@@ -164,7 +164,7 @@ BufLSB		= <BufBASE			; Low byte offset
 .L28F7
         BCS     L28FC
 
-        JMP     LF6BF						; Print "no room"
+        JMP     NO_ROOM					; Print "no room"
 
 .L28FC
         STY     TEXTPTR
@@ -260,7 +260,7 @@ BufLSB		= <BufBASE			; Low byte offset
         STA     DRIVENO
         JSR     START_MOTOR_SELECT          ; start drive motor
 
-        JSR     LF4EC                       ; Read sectors
+        JSR     ROM_READ_SECTORS            ; Read sectors
 
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
@@ -274,7 +274,7 @@ BufLSB		= <BufBASE			; Low byte offset
         STA     DRIVENO
         JSR     START_MOTOR_SELECT          ; start drive motor
 
-        JSR     LF713                       ; write sectors
+        JSR     ROM_WRITE_SECTORS           ; write sectors
 
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
@@ -363,9 +363,4 @@ SAVE "COPYF.DFS",BeebDisStartAddr,BeebDisEndAddr
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        SYS40   = 1
-if (WD1770)		
-        include "../src/sys5-1f-1770.asm"
-else
-        include "../src/sys5-1f.asm"
-endif
+        include "..\src\rominclude.asm"

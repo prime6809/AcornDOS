@@ -463,11 +463,11 @@ jsr     PRSPACE                   ; Print space
 .LF17D
 		RTS                    
  
- ;============================================
+;============================================
 ; Check end of command
 ;--------------------------------------------
 
-.LF17E
+.GET_CHK_FNAME
 		JSR 	CHECK_FNPARAM           
 	
 ;============================================
@@ -561,7 +561,7 @@ jsr     PRSPACE                   ; Print space
 ; *INFO <file> - display file information
 ; =======================================
 .infocom
-		JSR 	LF17E					; Check filename in cat 
+		JSR 	GET_CHK_FNAME			; Check filename in cat 
 		JSR 	print_info				; Print filenaam, start,link,lengte,sector
 		JMP 	set_qual_to_use         ; Set qual back if changed by USE
  
@@ -915,7 +915,7 @@ jsr     PRSPACE                   ; Print space
 ; *DELETE <file>
 ; ==============
 .deletecom
-		JSR 	LF17E                   ; Filename in cat
+		JSR 	GET_CHK_FNAME           ; Filename in cat
 		sty     FILENAMEPTR             ; Save pointer to name
 .LF468
 		jsr     print_info_ifmon        ; Print info
@@ -1023,7 +1023,8 @@ jsr     PRSPACE                   ; Print space
 		
         ldy     FILENAMEPTR             ; recover filename ptr
         jsr     print_info_ifmon        ; Print file info (if MON).
-.LF4EC
+
+.ROM_READ_SECTORS
 		jsr     copy_for_read           ; Copy reader into low ram
         lda     #ICMD_READ_MULTI+ICMD_DRIVE0	; Multi sector read $53
 
@@ -1214,7 +1215,7 @@ jsr     PRSPACE                   ; Print space
 ; ==============
 .unlockcom
 		php                             ; Save flags
-		JSR 	LF17E					; Check filename in cat 
+		JSR 	GET_CHK_FNAME			; Check filename in cat 
         lda     USEQUAL                 ; Get qualifier 
         rol     A                       ; Shift top bit to carry
         plp                             ; restore flags (lock falg in carry)
@@ -1287,7 +1288,7 @@ jsr     PRSPACE                   ; Print space
 		EQUS 	"Syntax?"
 		BRK
 		
-.LF641
+.DISK_FULL
 		JSR 	INLINE_PRINT           	; Disk full
 		EQUS 	"Full"
 		BRK
@@ -1359,7 +1360,7 @@ jsr     PRSPACE                   ; Print space
         ldy     WKBASE + $0105          ; 
         BEQ 	LF6E2           		; Disk empty?
 		CPY 	#&F8            		; Disk full?  
-		BCS 	LF641         
+		BCS 	DISK_FULL         
 		
 		JSR 	LF37E           		; Calculate ??
 		JMP 	LF6B8           		
@@ -1374,7 +1375,7 @@ jsr     PRSPACE                   ; Print space
 
 .LF6BD
 		BCS 	LF6CA           
-.LF6BF		
+.NO_ROOM		
 		JSR 	INLINE_PRINT          
 		EQUS 	"No room"
 		BRK
@@ -1425,7 +1426,7 @@ jsr     PRSPACE                   ; Print space
  
 .LF710
 		JSR 	LF67D           
-.LF713
+.ROM_WRITE_SECTORS
 		jsr     copy_for_write          ; Copy write routine into RAM
         lda     #ICMD_WRITE_MULTI + ICMD_DRIVE0	; Write multiple drive 0 
 		JMP 	LF4F1          
@@ -2315,7 +2316,7 @@ endif
 		STA &E6             ; FBC0 85 E6     .f  
 		LDA WKBASE + &021D,Y         ; FBC2 B9 1D 22  9." 
 		STA &E5             ; FBC5 85 E5     .e  
-		JSR LF713           ; FBC7 20 13 F7   .w 
+		JSR ROM_WRITE_SECTORS           ; FBC7 20 13 F7   .w 
 
 		LDY &C2             ; FBCA A4 C2     $B  
 		LDA #&BF            ; FBCC A9 BF     )?  
@@ -2323,7 +2324,7 @@ endif
 		BCC LFBD9           ; FBD1 90 06     ..  
 .LFBD3
 		JSR LFADC           ; FBD3 20 DC FA   \z 
-		JSR LF4EC           ; FBD6 20 EC F4   lt 
+		JSR ROM_READ_SECTORS ; FBD6 20 EC F4   lt 
 .LFBD9
 		JSR WAIT_NOT_BUSY           ; FBD9 20 5B F2   [r 
 		LDY &C2             ; FBDC A4 C2     $B  

@@ -248,7 +248,7 @@ SaveSrcCat	= $2C00							; saved source drive catalog
         STA     DRIVENO
         JSR     START_MOTOR_SELECT
 
-        JSR     LF4EC
+        JSR     ROM_READ_SECTORS
 
         JSR     WAIT_NOT_BUSY
 
@@ -262,7 +262,7 @@ SaveSrcCat	= $2C00							; saved source drive catalog
         STA     DRIVENO
         JSR     START_MOTOR_SELECT
 
-        JSR     LF713
+        JSR     ROM_WRITE_SECTORS
 
         JSR     WAIT_NOT_BUSY
 
@@ -360,9 +360,4 @@ SAVE "DUTY.DFS",BeebDisStartAddr,BeebDisEndAddr
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        SYS40   = 1
-if (WD1770)		
-        include "../src/sys5-1f-1770.asm"
-else
-        include "../src/sys5-1f.asm"
-endif
+        include "..\src\rominclude.asm"

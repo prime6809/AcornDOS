@@ -158,7 +158,7 @@ BufLSB		= <BufBASE			; Low byte offset
 
         LDA     #BufMSB						; Set buffer address for read
         STA     LOADADDR+1
-        JSR     LF4EC						; Read sectors
+        JSR     ROM_READ_SECTORS			; Read sectors
 
         JSR     WAIT_NOT_BUSY				; Wait for drive to be available
 
@@ -169,7 +169,7 @@ BufLSB		= <BufBASE			; Low byte offset
 		
         LDA     #BufMSB						; Set buffer address for write
         STA     LOADADDR+1
-        JSR     LF713						; Write sectors
+        JSR     ROM_WRITE_SECTORS			; Write sectors
 
         JSR     WAIT_NOT_BUSY				; Wait for drive to be available
 
@@ -248,10 +248,4 @@ SAVE "COMPACT.DFS",BeebDisStartAddr,BeebDisEndAddr
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        SYS40   = 1
-if (WD1770)		
-        include "../src/sys5-1f-1770.asm"
-else
-        include "../src/sys5-1f.asm"
-endif
-		
+        include "..\src\rominclude.asm"

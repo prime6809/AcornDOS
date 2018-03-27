@@ -276,4 +276,5 @@ endif
 ; however the assembled copy is not saved (as ISROM=0)
 ;
         SYS40   = 1
+		INCLUDEVDG=0
         include "../src/sys5-1f.asm"
