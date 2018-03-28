@@ -6,6 +6,8 @@
 # http://www.retrosoftware.co.uk/wiki/index.php?title=BeebAsm
 #
 
+include ../vars.mk
+
 # roms, Build 40 and 80 column variants of system roms with both 
 # floppy controllers
 all: sysrom40 sysrom80 sysrom-wd40 sysrom-wd80 

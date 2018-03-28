@@ -6,6 +6,8 @@
 # http://www.retrosoftware.co.uk/wiki/index.php?title=BeebAsm
 #
 
+include ../vars.mk
+
 # Main target build everything
 all: utils format 
 
