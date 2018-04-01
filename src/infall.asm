@@ -1,8 +1,15 @@
-		include "../src/sysdefs.asm"
-       	include "../src/wdfdc.asm"
+
+		include "../src/platinclude.asm"
+		include "../src/wdfdc.asm"
 		include "../src/intelfdc.asm"
 
-        org     $2800
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
+
 .BeebDisStartAddr
         JSR     READ_CAT				; read disk catalog
 

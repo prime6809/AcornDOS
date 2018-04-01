@@ -1,17 +1,31 @@
-		include "../src/sysdefs.asm"
-       	include "../src/wdfdc.asm"
+		include "../src/platinclude.asm"
+		include "../src/wdfdc.asm"
 		include "../src/intelfdc.asm"
 
-SrcDrive	= $2BFE							; saved source drive
-DstDrive	= $2BFF							; saved dest drive
-SaveSrcCat	= $2C00							; saved source drive catalog
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
 
-        org     $2800
+BufBASE		= BASE+$0400		; buffer used for copying sectors
+BufMSB		= >BufBASE			; High byte (page)
+BufLSB		= <BufBASE			; Low byte offset
+
+SrcDrive	= BASE+$03FE					; saved source drive
+DstDrive	= BASE+$03FF					; saved dest drive
+SaveSrcCat	= BASE+$0400					; saved source drive catalog
+
 .BeebDisStartAddr
         JSR     INLINE_PRINT				; Signon message 
 
         EQUB    $0C
+if(ATOM=1)
+        EQUS    "DUTY PROGRAM"
+else
         EQUS    "Duty Program"
+endif
         EQUB    $0A
 
         NOP
@@ -19,8 +33,11 @@ SaveSrcCat	= $2C00							; saved source drive catalog
 
         EQUB    $0A
         EQUB    $0D
-        EQUS    "From drive ?"
-
+if(ATOM=1)
+        EQUS    "FROM DRIVE ?"
+else
+		EQUS    "From drive ?"
+endif
         NOP
         JSR     GET_DRIVENO					; get source driveno
 
@@ -30,8 +47,11 @@ SaveSrcCat	= $2C00							; saved source drive catalog
 
         EQUB    $0D
         EQUB    $0A
+if(ATOM=1)
+        EQUS    "  TO DRIVE ?"
+else
         EQUS    "  to drive ?"
-
+endif
         NOP
         JSR     GET_DRIVENO					; get dest driveno
 
@@ -172,9 +192,13 @@ SaveSrcCat	= $2C00							; saved source drive catalog
 
 .ERROR_QUIT
         JSR     INLINE_PRINT				; Print unable to copy error and quit
+if(ATOM=1)
+        EQUS    "UNABLE TO COPY"
+else
         EQUS    "Unable to Copy"
+endif
         BRK
-		
+
 .L2939
         LDY     FILENAME+5
         JSR     decy8
@@ -242,7 +266,7 @@ SaveSrcCat	= $2C00							; saved source drive catalog
         STA     STARTSEC+1
         LDA     FILENAME+2
         STA     STARTSEC
-        LDA     #$2C
+        LDA     #BufMSB
         STA     LOADADDR+1
         LDA     SrcDrive
         STA     DRIVENO
@@ -256,7 +280,7 @@ SaveSrcCat	= $2C00							; saved source drive catalog
         STA     STARTSEC+1
         LDA     FILENAME+4
         STA     STARTSEC
-        LDA     #$2C
+        LDA     #BufMSB
         STA     LOADADDR+1
         LDA     DstDrive
         STA     DRIVENO
@@ -305,7 +329,11 @@ SaveSrcCat	= $2C00							; saved source drive catalog
 
 .L2A0D
         JSR     INLINE_PRINT
+if(ATOM=1)
+        EQUS    "COPY COMPLETED "
+else
         EQUS    "Copy completed "
+endif
 
 .L2A1F
         NOP
@@ -322,9 +350,11 @@ SaveSrcCat	= $2C00							; saved source drive catalog
         JSR     PRINT_HEXA
 
         JSR     INLINE_PRINT
-
+if(ATOM=1)
+        EQUS    " FREE SECTORS"
+else
         EQUS    " free sectors"
-
+endif
         NOP
         JMP     OSCRLF						; Exit after OSCRLF
 
@@ -347,9 +377,12 @@ SaveSrcCat	= $2C00							; saved source drive catalog
 
 .L2A61
         JSR     INLINE_PRINT				; print error
-
+if(ATOM=1)
+        EQUS    "TRY AGAIN! (0-3) "
+else
         EQUS    "try again! (0-3) "
-        NOP	
+endif
+		NOP
         JMP     GET_DRIVENO						; loop again
 
 .BeebDisEndAddr

@@ -1,15 +1,22 @@
 ;
 ; copy files from one logical disk to another.
 ;
-        org     $2800
 
-		include "../src/sysdefs.asm"
-       	include "../src/wdfdc.asm"
+		include "../src/platinclude.asm"
+		include "../src/wdfdc.asm"
 		include "../src/intelfdc.asm"
 		
-BufBASE		= $2C00				; buffer used for copying sectors
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
+
+BufBASE		= BASE+$0400		; buffer used for copying sectors
 BufMSB		= >BufBASE			; High byte (page)
 BufLSB		= <BufBASE			; Low byte offset
+
 		
 .BeebDisStartAddr
         LDA     CMDLINE+2					; Get 3rd character from command line
@@ -28,28 +35,28 @@ BufLSB		= <BufBASE			; Low byte offset
         BEQ     ErrorExit					; if so error!
 
         JSR     INLINE_PRINT                ; print from message
-
-.L2821
+if(ATOM=1)
+        EQUS    "COPYING FILES FROM DRIVE "
+else
         EQUS    "Copying files from drive "
-
-.L283A
+endif
         NOP
         LDA     FromDrive                 	; get source drive
         JSR     PRINT_HEXA_LOWN             ; print it
 
         JSR     INLINE_PRINT                ; print to message
-
-.L2844
+if(ATOM=1)
+        EQUS    " TO DRIVE "
+else
         EQUS    " to drive "
-
-.L284E
+endif
         NOP
         LDA     ToDrive                   	; get dest drive 
         JSR     PRINT_HEXA_LOWN             ; print it
 
         JSR     OSCRLF                      ; EOL
 
-        JMP     L287A
+        JMP     FileError
 
 ;
 ; Validate supplied ASCII drive number in A
@@ -69,20 +76,20 @@ BufLSB		= <BufBASE			; Low byte offset
 
 .ErrorExit
         JSR     INLINE_PRINT
-
-.L2869
+if(ATOM=1)
+        EQUS    "COPYF PARAMETERS"
+else
         EQUS    "COPYF parameters"
+endif
+        BRK
 
-.L2879
-        EQUB    $00
-
-.L287A
+.FileError
         JSR     INLINE_PRINT				; Prompt for filename
-
-.L287D
+if(ATOM=1)
+        EQUS    "?FILE?"
+else
         EQUS    "?file?"
-
-.L2883
+endif
         NOP
         JSR     READ_LINE					; read filename to $100-$140
 
@@ -305,7 +312,7 @@ BufLSB		= <BufBASE			; Low byte offset
         ORA     FILENAME
         BNE     L2976
 
-        JMP     L287A
+        JMP     FileError
 
 .L29E1
         LDA     WKStartSec1,Y

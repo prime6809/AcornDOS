@@ -2,13 +2,18 @@
 ; copy a logical disk from one drive to another.
 ;
 
-		include "../src/sysdefs.asm"
-       	include "../src/wdfdc.asm"
+		include "../src/platinclude.asm"
+		include "../src/wdfdc.asm"
 		include "../src/intelfdc.asm"
 
-        org     $2800
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
 
-BufBASE		= $2C00				; buffer used for copying sectors
+BufBASE		= BASE+$0400		; buffer used for copying sectors
 BufMSB		= >BufBASE			; High byte (page)
 BufLSB		= <BufBASE			; Low byte offset
 
@@ -38,23 +43,23 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         BEQ     ErrorExit					; if so error!
 
         JSR     INLINE_PRINT                ; print from message
-
-.L2821
+if(ATOM=1)
+		EQUS    "COPYING FROM DRIVE "
+else
         EQUS    "Copying from drive "
-
-.L2834
+endif
         NOP
-        LDA     FromDrive                 ; get source drive
+        LDA     FromDrive                 	; get source drive
         JSR     PRINT_HEXA_LOWN             ; print it
 
         JSR     INLINE_PRINT                ; print to message
-
-.L283E
+if(ATOM=1)
+        EQUS    " TO DRIVE "
+else
         EQUS    " to drive "
-
-.L2848
+endif
         NOP
-        LDA     ToDrive                   ; get dest drive 
+        LDA     ToDrive                   	; get dest drive 
         JSR     PRINT_HEXA_LOWN             ; print it
 
         JSR     OSCRLF                      ; EOL
@@ -62,7 +67,7 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         JSR     OSRDCH                      ; read keyboard
 
         CMP     #$1B                        ; escape?
-        BNE     DoCopy                       ; nope : go do copy
+        BNE     DoCopy                      ; nope : go do copy
 
         RTS
 
@@ -81,23 +86,24 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         AND     #$03						; convert to binary
         RTS
 
+
 .ErrorExit
         JSR     INLINE_PRINT
-
-.L2868
+if(ATOM=1)
+        EQUS    "COPY PARAMETERS"
+else
         EQUS    "COPY parameters"
-
-.L2877
-        BRK
+endif
+		BRK
+		
 .QuitTooSmall
-        EQUB    $20
-
-        ORA     #$F0
-.L287B
+        JSR		INLINE_PRINT
+if(ATOM=1)
+        EQUS    "DESTINATION TOO SMALL"
+else
         EQUS    "Destination too small"
-
-.L2890
-        EQUB    $00
+endif
+		BRK
 
 .DoCopy
         LDA     #$00                        ; Zero load address, filesize and start sector
@@ -111,8 +117,8 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         STA     FILESIZE+1
         LDA     FromDrive                   ; select drive to copy from
         STA     DRIVENO
-        JSR     load_cat_always             ; Unconditionally load catalog
 
+		JSR     load_cat_always             ; Unconditionally load catalog
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
         LDA     WKSecCLSB                   ; Get sector count of source drive MSB
@@ -126,8 +132,8 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
 
         LDA     ToDrive                     ; Select destination drive
         STA     DRIVENO
-        JSR     load_cat                    ; load it's catalog
 
+        JSR     load_cat                    ; load it's catalog
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
         LDA     WKSecCOpt                   ; Get sector count of destination drive MSB
@@ -147,10 +153,9 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
 
         LDA     #BufMSB                     ; Point at sector buffer
         STA     LOADADDR+1
+
         JSR     START_MOTOR_SELECT          ; start drive motor
-
-        JSR     ROM_READ_SECTORS                       ; Read sectors
-
+        JSR     ROM_READ_SECTORS            ; Read sectors
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
         LDA     #BufMSB                     ; Reset buffer pointer
@@ -159,20 +164,10 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         LDA     ToDrive                     ; get destination drive
         STA     DRIVENO
 
-if (WD1770)
-;        LDA     DestTrack                   ; restore destination track
-;        STA     WTRACK
-endif
         JSR     START_MOTOR_SELECT          ; start drive motor
-
-        JSR     ROM_WRITE_SECTORS                       ; write sectors
-
+        JSR     ROM_WRITE_SECTORS           ; write sectors	
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
-if (WD1770)
-;        LDA     WTRACK                      ; save dest drive track
-;        STA     DestTrack
-endif
         LDA     STARTSEC+1                  ; get LSB of start sector
         CLC                                 ; setup carry
         ADC     #SectorsToCopy              ; add no of sectors copied
@@ -215,7 +210,7 @@ endif
         RTS
 
 .FromDrive
-        BRK
+        EQUB    $00
 .ToDrive
         EQUB    $00
 .SecCountSrcLSB
@@ -224,10 +219,6 @@ endif
         EQUB    $00
 .OptSrc        
 		EQUB	$00
-if (WD1770)		
-.DestTrack
-        EQUB    $00
-endif
 
 .BeebDisEndAddr
 SAVE "COPY.DFS",BeebDisStartAddr,BeebDisEndAddr

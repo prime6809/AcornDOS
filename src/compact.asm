@@ -1,36 +1,42 @@
 ;
 ; AcornDOS compact command.
 ;
-
-		ORG		$2800
 		
-		include "../src/sysdefs.asm"
+		include "../src/platinclude.asm"
 		include "../src/wdfdc.asm"
 		include "../src/intelfdc.asm"
 
-FileSecCountLSB   = $E7
-FileSecCountMSB	  = $E8
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
 
-SourceStartSecLSB   = $00E9
-SourceStartSecMSB   = $00EA
-
-DestStartSecLSB   = $00EB		; LSB and MSB of current move to sector ?
-DestStartSecMSB   = $00EC
-
-DirPtr   = $00ED				; Current dir pointer whilst scanning
-
-BufBASE		= $2C00				; buffer used for copying sectors
+BufBASE		= BASE+$0400		; buffer used for copying sectors
 BufMSB		= >BufBASE			; High byte (page)
 BufLSB		= <BufBASE			; Low byte offset
 
-        org     $2800
+
+FileSecCountLSB   	= STARTSEC+2
+FileSecCountMSB	  	= FILENAME
+
+SourceStartSecLSB 	= FILENAME+1
+SourceStartSecMSB 	= FILENAME+2
+
+DestStartSecLSB		= FILENAME+3	; LSB and MSB of current move to sector ?
+DestStartSecMSB   	= FILENAME+4
+
+DirPtr   			= FILENAME+5	; Current dir pointer whilst scanning
+
+
 .BeebDisStartAddr
         JSR     INLINE_PRINT                ; Print signon message
-
-.L2803
+if(ATOM=1)
+        EQUS    "COMPACTING DRIVE "
+else
         EQUS    "Compacting drive "
-
-.L2814
+endif
         NOP
         LDA     DRIVENO                     ; Get drive number
         JSR     PRINT_HEXA_LOWN             ; print it
@@ -59,7 +65,7 @@ BufLSB		= <BufBASE			; Low byte offset
         
         LDA     #$00                        
         STA     DestStartSecMSB
-;2838
+
 .CompactNext
         LDY     DirPtr                      ; get saved no files on disk
         JSR     decy8                       ; y=y-8
@@ -212,9 +218,11 @@ BufLSB		= <BufBASE			; Low byte offset
 
 .CompactDone
         JSR     INLINE_PRINT				; print finishing message
-
-.L28FF
+if(ATOM=1)
+        EQUS    "DISK COMPACTED "
+else
         EQUS    "Disk Compacted "
+endif
 
 .L290E
         NOP
@@ -232,11 +240,11 @@ BufLSB		= <BufBASE			; Low byte offset
         JSR     PRINT_HEXA					; and print it.
 
         JSR     INLINE_PRINT				; print message
-
-.L2927
+if(ATOM=1)
+        EQUS    " FREE SECTORS"
+else
         EQUS    " free sectors"
-
-.L2934
+endif
         NOP									; and EOL, rts will return to OS.		
         JMP     OSCRLF
 

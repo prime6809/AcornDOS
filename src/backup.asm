@@ -3,12 +3,20 @@
 ; Copies both sides of a physical disk.
 ;
 
-    include "..\src\sysdefs.asm"
-    include "..\src\wdfdc.asm"
-    include "..\src\intelfdc.asm"
+		include "../src/platinclude.asm"
+		include "../src/wdfdc.asm"
+		include "../src/intelfdc.asm"
+	
 L214F   = $214F
 
-BufBASE		= $2C00				; buffer used for copying sectors
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
+
+BufBASE		= BASE+$0400		; buffer used for copying sectors
 BufMSB		= >BufBASE			; High byte (page)
 BufLSB		= <BufBASE			; Low byte offset
 
@@ -21,17 +29,16 @@ BufLSB		= <BufBASE			; Low byte offset
 TracksToCopy    = 5
 SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (5 tracks worth).
 
-        org     $2800
 .BeebDisStartAddr
         NOP
         JSR     OSCRLF                      ; Print EOL
 
         JSR     INLINE_PRINT                ; Signon message
-
-.L2807
+if(ATOM=1)
+        EQUS    "SOURCE DRIVE ?"
+else
         EQUS    "Source drive ?"
-
-.L2815
+endif
         NOP
         JSR     OSRDCH                      ; Read source drive
 
@@ -112,42 +119,40 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
 ; Print confirmation message including physical drove numbers
 .ConfirmMessage
         JSR     INLINE_PRINT                ; print message
-
-.L2893
+if(ATOM=1)
+        EQUS    "BACKING UP FROM DRIVE "
+else
         EQUS    "Backing up from drive "
-
-.L28A9
+endif
         NOP                                 ; print source drive
         LDA     SourceDrive
         JSR     PRINT_HEXA_LOWN
 
         JSR     INLINE_PRINT                ; print message
-
-.L28B3                                      
+if(ATOM=1)
+        EQUS    " TO DRIVE "                
+else
         EQUS    " to drive "                
-
-.L28BD
+endif
         NOP                                 ; print destination drive
         LDA     DestDrive
         JSR     PRINT_HEXA_LOWN
 
         JSR     INLINE_PRINT                ; print ok? message
 
-.L28C7
         EQUS    " OK ? "
-
-.L28CD
         NOP
         RTS
 
 
 .QuitTooSmall
         JSR     INLINE_PRINT                ; Error : destination too small.
-
-.L28D2
+if(ATOM=1)
+        EQUS    "DESTINATION TOO SMALL"
+else
         EQUS    "Destination too small"
-.L28E7
-        EQUB    $00                         ; brk
+endif
+		BRK
 
 ; Do the actual backup operation between the two logical drives specified in FromDrive and ToDrive
 
@@ -217,11 +222,6 @@ SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (
         JSR     ROM_WRITE_SECTORS           ; write sectors
 
         JSR     WAIT_NOT_BUSY               ; wait for drive
-
-if (WD1770)
-;        LDA     WTRACK                      ; save dest drive track
-;        STA     DestTrack
-endif 
 
         LDA     STARTSEC+1                  ; get LSB of start sector
         CLC                                 ; setup carry

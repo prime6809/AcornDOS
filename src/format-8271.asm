@@ -5,10 +5,16 @@
 ; of the format code, to remain inline with the 1770 implementation.
 ; 
 
-		include "../src/sysdefs.asm"
+		include "../src/platinclude.asm"
        	include "../src/intelfdc.asm"
 
-        org     $2800
+if(ATOM=1)
+		BASE	= $2900
+else
+		BASE	= $2800
+endif
+		org     BASE
+		
 .codestart
 if(FORMAT)
         JSR     INLINE_PRINT				; Print confirmation message
@@ -275,6 +281,6 @@ endif
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        SYS40   = 1
-		INCLUDEVDG=0
-        include "../src/sys5-1f.asm"
+        include "..\src\rominclude.asm"
+
+;        include "../src/ados.asm"
