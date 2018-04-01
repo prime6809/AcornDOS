@@ -1518,7 +1518,10 @@ skipto $f62c
 ; Select drive / side                HARDWARE
 ;--------------------------------------------
 .START_MOTOR_SELECT: 
-		JSR		GET_DRV_Y				; Get driveno in Y
+		lda     DRIVENO                 ; Get drive no
+        and     #$03                    ; Mask it
+        tay                             ; Get driveno into pointer
+
         ora     #MOTOR_ON               ; Flag drive running
         sta     DRIVENO                 ; update driveno
 
@@ -1527,14 +1530,15 @@ skipto $f62c
 		ora		drvtab,y				; Mask in drive select / side select
 		sta		PCTRL
         
+		jsr		GET_PDRV_Y
 		lda		SAVTRK0,y				; get current track for this drive
 		sta		WTRACK					
 		
         rts
 
-.GET_DRV_Y
+.GET_PDRV_Y
 		lda     DRIVENO                 ; Get drive no
-        and     #$03                    ; Mask it
+        and     #$01                    ; Mask it
         tay                             ; Get driveno into pointer
 		rts
                              
@@ -1755,7 +1759,7 @@ endif
         JSR     ERRTYPE1          	; Check type 1 error
         BCS     SEEK                ; if error, try again    
 .SAVE_CTRACK
-		JSR		GET_DRV_Y			; get driveno in y
+		JSR		GET_PDRV_Y			; get driveno in y
 		LDA		WTRACK				; get track from WD
 		STA		SAVTRK0,y			; save it
         RTS            
