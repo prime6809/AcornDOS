@@ -750,7 +750,8 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
 ; Command table
 ;--------------------------------------------
 
-.COMMAND_TABLE: EQUB    "CAT",    >catcom,<catcom
+.COMMAND_TABLE: 
+		EQUB    "CAT",    >catcom,<catcom
         EQUB    "DIR",    >dircom,<dircom
         EQUB    "INFO",   >infocom,<infocom
         EQUB    "LOAD",   >loadcom,<loadcom
@@ -769,11 +770,7 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
         EQUB    "SHUT",   >shutcom,<shutcom
         EQUB    "GO",     >gocom,<gocom 
         EQUB    "SPOOL",  >spoolcom,<spoolcom
-if (INCLUDEVDG <> 0) 
         EQUB    "VDU",    >vducom,<vducom
-else
-		EQUB	"VDU",	  >LE067,<LE067		; just a convenient RTS
-endif
         EQUB    >exec,<exec             ; *filename entry
 
 ;============================================
@@ -1363,8 +1360,11 @@ if (INCLUDEVDG <> 0)
 .LE6F9: EQUB    <$FE94, >$FE94                     
 		EQUB    <VDU_WRCVEC, >VDU_WRCVEC
 		EQUB	<VDU_RDCVEC, >VDU_RDCVEC
+else
+.vducom:                                
+		RTS
 endif
-
+		skipto $E6FF
 ;--------------------------------------------
 ; Initialise drive for loading catalog
 ;--------------------------------------------
@@ -2633,6 +2633,7 @@ endif
 ; DOS Interpreter entry
 ;--------------------------------------------
 
+
 .LEEE2: ldx     #VECOFS                 ; point at LODVEC
 .LEEE4: lda     VECTBL-VECOFS,X         ; get byte from ROM
         sta     VECBASE,X               ; put in vector table
@@ -2723,7 +2724,7 @@ endif
 
 .VECTBL EQUB    <NEW_LODVEC, >NEW_LODVEC      ; $20C LODVEC
         EQUB    <NEW_SAVVEC, >NEW_SAVVEC      ; $20E SAVVEC
-        EQUB    <NEW_RDRVEC, >NEW_RDRVEC		; $210 RDRVEC
+        EQUB    <NEW_RDRVEC, >NEW_RDRVEC	  ; $210 RDRVEC
         EQUB    <NEW_STRVEC, >NEW_STRVEC      ; $212 STRVEC
         EQUB    <NEW_BGTVEC, >NEW_BGTVEC      ; $214 BGTVEC
         EQUB    <NEW_BPTVEC, >NEW_BPTVEC      ; $216 BPTVEC
