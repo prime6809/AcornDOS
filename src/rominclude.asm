@@ -7,7 +7,7 @@ if(ATOM=1)
 	print "Assembling for ATOM"
 	SYS40   = 1
 	IOBASE 	= $EFF0
-	INCLUDEVDG	= 0
+	INCLUDEVDG	= 1
 
 	if (WD1770)		
         include "..\src\ados1770.asm"

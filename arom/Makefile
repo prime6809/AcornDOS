@@ -24,10 +24,10 @@ ados40: $(ROMSRC) $(INCLUDES)
 	$(ASM) -i $(SRCPATH)/ados.asm -D INCLUDEVDG=1 -D SYS40=1 -D ISROM=1 -o ados-40.rom -v > $(LIST)/ados-40.txt
 
 ados80: $(ROMSRC) $(INCLUDES)
-	$(ASM) -i $(SRCPATH)/ados.asm -D INCLUDEVDG=1 -D SYS40=0 -D ISROM=1 -o ados-40.rom -v > $(LIST)/ados-40.txt
+	$(ASM) -i $(SRCPATH)/ados.asm -D INCLUDEVDG=1 -D SYS40=0 -D ISROM=1 -o ados-40.rom -v > $(LIST)/ados-80.txt
 
 ados-novdg: $(ROMSRC) $(INCLUDES)
-	$(ASM) -i $(SRCPATH)/ados.asm -D INCLUDEVDG=0 -D SYS40=1 -D ISROM=1 -o ados-40.rom -v > $(LIST)/ados-40.txt
+	$(ASM) -i $(SRCPATH)/ados.asm -D INCLUDEVDG=0 -D SYS40=1 -D ISROM=1 -o ados-40.rom -v > $(LIST)/ados-novdg.txt
 
 gdos1770-bc00: $(ROMSRC) $(INCLUDES)
 	$(ASM) -i $(SRCPATH)/gdos150.asm -D IOBASE=\$$BC10 -D ISROM=1 -o gdos1770-bc00.rom -v > $(LIST)/gdos1770-bc10.txt

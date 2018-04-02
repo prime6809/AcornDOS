@@ -20,8 +20,11 @@ if(FORMAT)
         JSR     INLINE_PRINT				; Print confirmation message
 
         EQUB    $0D
+if(ATOM=1)
+        EQUS    "DO YOU REALLY WANT TO FORMAT DRIVE "
+else		
         EQUS    "Do you really want to format drive "
-
+endif
         LDA     DRIVENO						; print drive number
         JSR     PRINT_HEXA_LOWN
 
@@ -122,7 +125,11 @@ if(FORMAT)
         JSR     INLINE_PRINT
 
         EQUB    $0D
-        EQUS    "Formatted"
+if(ATOM=1)
+        EQUS    "FORMATTED"
+else
+		EQUS    "Formatted"
+endif
         EQUB    $0A
         EQUB    $0D
 
@@ -140,10 +147,6 @@ else
 		lda		#<TotalTrk80
 		sta		WKSecCLSB
 endif		
-;        LDA     #$03						; Setup default opt
-;        STA     WKSecCOpt
-;        LDA     #$20						; setup default qualifier
-;        STA     WKSecCLSB
         JSR     write_cat					; write blank catalog to disk
 
         JMP     L28EF
@@ -153,7 +156,11 @@ endif
         JSR     INLINE_PRINT
 
         EQUB    $0D
+if(ATOM=1)
+        EQUS    "CRUNCH"
+else
         EQUS    "Crunch"
+endif
         NOP
         BRK
 else
@@ -218,8 +225,12 @@ endif
         JSR     OSCRLF						; print EOL
         JSR     INLINE_PRINT				; print verified message
 
+if(ATOM=1)
+        EQUS    "VERIFIED"
+else
         EQUS    "Verified"
-        EQUB    $0A,$0D
+endif
+		EQUB    $0A,$0D
 
 .L294B
         NOP
@@ -233,8 +244,11 @@ endif
         JSR     INLINE_PRINT				; print error message
 
         EQUB	$0A
+if(ATOM=1)
+        EQUS    "FAILURE AT "
+else
         EQUS    "Failure at "
-
+endif
         LDA     SECTORNO					; get sector no
         JSR     PRINT_HEXA					; print it
 		BRK									; exit

@@ -75,9 +75,9 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
 ;--------------------------------------------
 
         lda     #$01                    ; HARDWARE Reset controller
-        sta     IFDCRESET                ; HARDWARE
+        sta     IFDCRESET               ; HARDWARE
         lda     #$00                    ; Clear reset bit
-        sta     IFDCRESET                ; HARDWARE
+        sta     IFDCRESET               ; HARDWARE
 
         jmp     LEEE2                   ; Interpreter entry
 
@@ -85,7 +85,7 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
 ; Print DISK on screen
 ;--------------------------------------------
 
-.LE00D: jsr     INLINE_PRINT             ; Print "DISK "
+.LE00D: jsr     INLINE_PRINT            ; Print "DISK "
         EQUB    "DISK "                 
         nop                             
 
@@ -2766,7 +2766,7 @@ if (ISROM=1)
     if (SYS40=1)
       SAVE"ados-40.rom",$E000,$F000,$E000           
     else
-      SAVE"ados-40.rom",$E000,$F000,$E000           
+      SAVE"ados-80.rom",$E000,$F000,$E000           
     endif
   else
       SAVE"ados-novdg.rom",$E000,$F000,$E000           
