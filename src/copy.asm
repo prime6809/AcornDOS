@@ -22,9 +22,8 @@ BufLSB		= <BufBASE			; Low byte offset
 ; $E000 - $2C00 = $B400 bytes.
 ; Since sectors are $100 bytes long this gives us a maximum of $B4 (180) sectors, or 18 tracks.
 ; 
-; Tracks to copy defined in platinclude.asm
+; Defined in platinclude.asm
 ; 
-SectorsToCopy   = (TracksToCopy*10)        ; Copy blocks of 50 sectors at once (5 tracks worth).
 
 .BeebDisStartAddr
         LDA     CMDLINE+2					; Get 3rd character from command line

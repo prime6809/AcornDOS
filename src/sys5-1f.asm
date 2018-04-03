@@ -1024,6 +1024,14 @@ jsr     PRSPACE                   ; Print space
         ldy     FILENAMEPTR             ; recover filename ptr
         jsr     print_info_ifmon        ; Print file info (if MON).
 
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; reading sectors from a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_READ_SECTORS
 		jsr     copy_for_read           ; Copy reader into low ram
         lda     #ICMD_READ_MULTI+ICMD_DRIVE0	; Multi sector read $53
@@ -1426,6 +1434,15 @@ jsr     PRSPACE                   ; Print space
  
 .LF710
 		JSR 	LF67D           
+
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; writing sectors to a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_WRITE_SECTORS
 		jsr     copy_for_write          ; Copy write routine into RAM
         lda     #ICMD_WRITE_MULTI + ICMD_DRIVE0	; Write multiple drive 0 

@@ -1061,6 +1061,15 @@ DRVSID_MASK	= PDDEN + PRESET + P4080	; Mask to zero drive & side bits
 		
         ldy     FILENAMEPTR             ; recover filename ptr
         jsr     print_info_ifmon        ; Print file info (if MON).
+
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; reading sectors from a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_READ_SECTORS
 		lda		#WCMD_READ_SEC			; Flag reading
 
@@ -1468,6 +1477,15 @@ skipto $f62c
         
 .LF710
 		JSR 	LF67D           
+
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; writing sectors to a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_WRITE_SECTORS
         LDA		#WCMD_WRITE_SEC			; Flag we are writing
 		jmp     common_rw               ; Go do it

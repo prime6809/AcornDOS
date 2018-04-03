@@ -254,12 +254,12 @@ endif
 .L2997
         LDA     STARTSEC+2
         TAY
-        CMP     #$14
+        CMP     #CopyBuffSize
         LDA     FILENAME
         SBC     #$00
         BCC     L29A4
 
-        LDY     #$14
+        LDY     #CopyBuffSize
 .L29A4
         STY     FILESIZE+1
         LDA     FILENAME+1

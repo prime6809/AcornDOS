@@ -16,7 +16,6 @@ endif
 BufBASE		= BASE+$0400		; buffer used for copying sectors
 BufMSB		= >BufBASE			; High byte (page)
 BufLSB		= <BufBASE			; Low byte offset
-
 		
 .BeebDisStartAddr
         LDA     CMDLINE+2					; Get 3rd character from command line
@@ -197,7 +196,7 @@ endif
         ORA     FILESIZE+1
         STA     FILESIZE+1
 .L2920
-        LDA     FILENAME,X
+        LDA     FILENAME,X				; copy filename to catalog, 8 bytes
         STA     WKFileName1,Y
         INY
         INX
@@ -205,23 +204,23 @@ endif
         BNE     L2920
 
 .L292B
-        LDA     FILENAMEPTR,X
+        LDA     FILENAMEPTR,X			; copy file data to catalog.
         DEY
         STA     WKLoadAddr1,Y
         DEX
         BNE     L292B
 
-        JSR     print_info
+        JSR     print_info				; Print copied file info
 
-        LDY     WKFileCount
+        LDY     WKFileCount				; update disk filecount
         JSR     incy8
 
-        STY     WKFileCount
-        JSR     write_cat
+        STY     WKFileCount				
+        JSR     write_cat				; write catalog back to dest disk
 
-        JSR     WAIT_NOT_BUSY
+        JSR     WAIT_NOT_BUSY			; Wait for disk
 
-        JSR     set_qual_to_use
+        JSR     set_qual_to_use			; set qualifier
 
         LDA     EXECADDR+1
         CLC
@@ -242,33 +241,35 @@ endif
         STA     FILENAME+4
         LDA     STARTSEC
         STA     FILENAME+3
-        LDA     #$00
+
+        LDA     #BufLSB						; Set LSB of buffer
         STA     LOADADDR
         STA     FILESIZE
+		
 .L2976
-        LDA     STARTSEC+2
+        LDA     STARTSEC+2					; Check sectors left to copy
         TAY
-        CMP     #$14
-        LDA     FILENAME
+        CMP     #CopyBuffSize				; More than copy buffer?
+        LDA     FILENAME	
         SBC     #$00
-        BCC     L2983
+        BCC     L2983						; no set it
 
-        LDY     #$14
+        LDY     #CopyBuffSize				; get CopyBuffSize worth of sectors
 .L2983
         STY     FILESIZE+1
         LDA     FILENAME+1
         STA     STARTSEC+1
         LDA     FILENAME+2
         STA     STARTSEC
+		
 		LDA     #BufMSB                     ; Point at sector buffer
         STA     LOADADDR+1
 
         LDA     FromDrive                   ; Get source drive id
         STA     DRIVENO
+
         JSR     START_MOTOR_SELECT          ; start drive motor
-
         JSR     ROM_READ_SECTORS            ; Read sectors
-
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
         LDA     FILENAME+3
@@ -279,10 +280,9 @@ endif
         STA     LOADADDR+1
         LDA     ToDrive                     ; get destination drive
         STA     DRIVENO
+
         JSR     START_MOTOR_SELECT          ; start drive motor
-
         JSR     ROM_WRITE_SECTORS           ; write sectors
-
         JSR     WAIT_NOT_BUSY               ; wait for drive
 
         LDA     FILESIZE+1

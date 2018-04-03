@@ -937,6 +937,14 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
         ldy     FILENAMEPTR             ; recover filename ptr
         jsr     print_info_ifmon        ; Print file info (if MON).
 
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; reading sectors from a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_READ_SECTORS: 
 		jsr     copy_for_read           ; Copy reader into low ram
         lda     #ICMD_READ_MULTI+ICMD_DRIVE0	; Multi sector read $53
@@ -951,7 +959,7 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
 .LE4B2: jsr     set_memptr              ; Set MEMPTR from STARTADDR, place to load at
 
         lda     FDCSAVCMD               ; Get FDC command to execute
-        jsr     read_write_sectors     ; Send it to the FDC
+        jsr     read_write_sectors     	; Send it to the FDC
         jsr     HANDLE_ERROR            ; Process any errors
         bne     LE4B2                   ; no error : do next block
 		
@@ -1314,6 +1322,15 @@ IFDCRESET	= IFDC8271 + 2				; Reset register
         jmp     WAIT_NOT_BUSY           ; Wait for it to finish
 
 .LE6AD: jsr     LE61A                   ; 20 1A E6
+
+;
+; Several of the utility programs BACKUP. COPY etc use this as an entry point for
+; writing sectors to a disk.
+; On entry LOADADDR should contain the address of the buffer to load the sectors in
+; and FILESIZE should be set to 256*number of sectors to read. DRIVENO should  be
+; set to the drive number to read sectors from.
+;
+
 .ROM_WRITE_SECTORS: 
 		jsr     copy_for_write          ; Copy write routine into RAM
         lda     #ICMD_WRITE_MULTI + ICMD_DRIVE0	; Write multiple drive 0 
@@ -1666,7 +1683,7 @@ NMIREADLEN	= NMIREADEND - NMIREAD
 .NMIWRITE
         jmp     $00F5                   ; 4C F5 00
         lda     WKBASE-1                ; Get data from RAM
-        sta     IFDCDATA                 ; Send to controller
+        sta     IFDCDATA                ; Send to controller
         pla                             
         rti                             
 .NMIWRITEEND

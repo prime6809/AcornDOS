@@ -12,6 +12,10 @@
 ; RAMTOP - BASE / 2560, and round down to the nearest integer.
 ; BASE will be $2C00 for the System and $2D00 for the Atom.
 ;
+;
+; Simarly to TracksToCopy, CopyBufferTracks is used by COPYF  and DUTY 
+; to size their buffers
+;
 
 if(ATOM=1)
 	include "../src/atomdefs.asm"
@@ -22,12 +26,19 @@ if(ATOM=1)
 	SMALL	= 1
 
 	if ((WD1770=0) and (SMALL=1))
-		TracksToCopy = 1
+		TracksToCopy 		= 1
+		CopyBufferTracks	= 1
 	else
-		TracksToCopy = 5
+		TracksToCopy 		= 5
+		CopyBufferTracks	= 1
 	endif
 else
 	include "../src/sysdefs.asm"
 
-	TracksToCopy = 5
+	TracksToCopy 		= 5
+	CopyBufferTracks	= 1
 endif
+
+
+SectorsToCopy   = (TracksToCopy*SECTRACK)        ; Copy blocks of 50 sectors at once (5 tracks worth).
+CopyBuffSize	= (CopyBufferTracks*SECTRACK)	 ; Size of buffer for copy (2 tracks worth)
