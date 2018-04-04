@@ -30,8 +30,8 @@
 	GUARD	&0000
 
 if(ISROM)	
-	include "..\src\sysdefs.asm"
-	include "..\src\wdfdc.asm"
+	include "../src/sysdefs.asm"
+	include "../src/wdfdc.asm"
 endif
 
 

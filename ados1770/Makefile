@@ -6,7 +6,7 @@
 # http://www.retrosoftware.co.uk/wiki/index.php?title=BeebAsm
 #
 
-include ..\vars.mk
+include ../vars.mk
 
 DEFS=-D ATOM=1 -D ISROM=0 -D WD1770=1
 

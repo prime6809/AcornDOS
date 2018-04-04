@@ -14,8 +14,8 @@
 ;
 
 if(ISROM)
-	include "..\src\atomdefs.asm"
-	include "..\src\wdfdc.asm"
+	include "../src/atomdefs.asm"
+	include "../src/wdfdc.asm"
 endif
 
 print "IOBASE=",~IOBASE
@@ -2869,9 +2869,9 @@ endif
 
 if (ISROM=1)
   if(IOBASE=$EFF0)
-    SAVE"ados1770-EFF0.rom",$E000,$F000,$E000           
+    SAVE"ados1770-eff0.rom",$E000,$F000,$E000           
   else
-    SAVE"ados1770-BC00.rom",$E000,$F000,$E000           
+    SAVE"ados1770-bc00.rom",$E000,$F000,$E000           
   endif
 endif
 

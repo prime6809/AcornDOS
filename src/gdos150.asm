@@ -12,8 +12,8 @@
 ; Produces binary equivilent to SALFAA.
 
 if(ISROM)
-	include "..\src\atomdefs.asm"
-	include "..\src\wdfdc.asm"
+	include "../src/atomdefs.asm"
+	include "../src/wdfdc.asm"
 endif
 
 ; Set SIMPLEIO = 1 if using a smple IO port, set to 0 for PIA
@@ -2483,8 +2483,8 @@ endif
 
 if (ISROM=1)
   if(IOBASE=$EFF0)
-    SAVE"gdos1770-EFF0.rom",$E000,$F000,$E000           
+    SAVE"gdos1770-eff0.rom",$E000,$F000,$E000           
   else
-    SAVE"gdos1770-BC00.rom",$E000,$F000,$E000           
+    SAVE"gdos1770-bc00.rom",$E000,$F000,$E000           
   endif
 endif

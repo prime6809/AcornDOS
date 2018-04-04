@@ -10,17 +10,17 @@ if(ATOM=1)
 	INCLUDEVDG	= 1
 
 	if (WD1770)		
-        include "..\src\ados1770.asm"
+        include "../src/ados1770.asm"
 	else
-        include "..\src\ados.asm"
+        include "../src/ados.asm"
 	endif
 else
 	print "Assembling for SYSTEM"
 	SYS40   = 1
 	if (WD1770)		
-        include "..\src\sys5-1f-1770.asm"
+        include "../src/sys5-1f-1770.asm"
 	else
-        include "..\src\sys5-1f.asm"
+        include "../src/sys5-1f.asm"
 	endif
 endif
 

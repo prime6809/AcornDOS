@@ -32,7 +32,7 @@ else
 	org base
 endif
 
-		include "..\src\atomdefs.asm"
+		include "../src/atomdefs.asm"
 
 ;-----------------------------------------------------------------
 ; MEMORY CHECK:

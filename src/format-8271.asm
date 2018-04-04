@@ -295,6 +295,5 @@ endif
 ; Here we include and assemble the system rom, this way we can access it's symbols
 ; however the assembled copy is not saved (as ISROM=0)
 ;
-        include "..\src\rominclude.asm"
+        include "../src/rominclude.asm"
 
-;        include "../src/ados.asm"
